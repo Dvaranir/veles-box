@@ -1,5 +1,7 @@
-data/*
-music/*
+navidrome/data/*
+navidrome/music/*
 
-!data/.gitkeep
-!music/.gitkeep
+!navidrome/data/.gitkeep
+!navidrome/music/.gitkeep
+
+*.zip
