@@ -1,7 +1,13 @@
 navidrome/data/*
 navidrome/music/*
 
-!navidrome/data/.gitkeep
-!navidrome/music/.gitkeep
+telegram-bot/music/*
+telegram-bot/temp/*
+
+!.gitkeep
 
 *.zip
+.env
+
+*backup_to_telegram.py
+*rename_files_with_artist_title.py
