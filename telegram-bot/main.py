@@ -492,7 +492,13 @@ async def save_temp_file_to_music_dir(update: Update, context: ContextTypes.DEFA
     
     shutil.move(temp_file_path, new_file_path)
     
-    await update.message.reply_text(f"Saved audio file as `{new_filename}`", )
+    query = update.callback_query
+    message = f"Saved audio file as `{new_filename}`"
+    
+    if query:
+        await query.edit_message_text(message)
+    else:
+        await update.message.reply_text(message)
     
     favorite_all_songs()
 
