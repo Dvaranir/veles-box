@@ -3,6 +3,7 @@ import re
 import logging
 import functools
 import requests
+import shutil
 
 from set_all_songs_favorite import favorite_all_songs
 from dotenv import load_dotenv
@@ -489,7 +490,7 @@ async def save_temp_file_to_music_dir(update: Update, context: ContextTypes.DEFA
     new_filename = await pick_available_filename(target_filename, ext, update)
     new_file_path = os.path.join(MUSIC_DIR, new_filename)
     
-    os.rename(temp_file_path, new_file_path)
+    shutil.move(temp_file_path, new_file_path)
     
     await update.message.reply_text(f"Saved audio file as `{new_filename}`", )
     
