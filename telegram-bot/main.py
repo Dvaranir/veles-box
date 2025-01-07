@@ -46,8 +46,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-TEMP_DIR = "/app/temp"
-MUSIC_DIR = "/app/music"
+TEMP_DIR = "/bot/temp"
+MUSIC_DIR = "/bot/music"
 
 (
     ASK_RENAME,
