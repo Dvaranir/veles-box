@@ -24,6 +24,7 @@ from telegram.ext import (
     CommandHandler,
     ConversationHandler,
 )
+from telegram.helpers import escape_markdown
 from yt_dlp import YoutubeDL
 
 dotenv_path = os.path.join(os.path.dirname(__file__), '../.env')
@@ -118,12 +119,12 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE):
 async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
     if update.message.audio:
         audio = update.message.audio
-        original_filename = sanitize_filename(audio.file_name)
+        original_filename = escape_markdown(sanitize_filename(audio.file_name))
         temp_file_path = os.path.join(TEMP_DIR, original_filename)
         
         sent_message = await update.message.reply_text(
             f"Saving file `{original_filename}` to temp directory",
-            parse_mode='Markdown'
+            parse_mode='MarkdownV2'
         )
         
         file = await context.bot.get_file(audio.file_id)
@@ -136,7 +137,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         await sent_message.edit_text(
             f"Do you want to rename the file `{original_filename}`?",
             reply_markup=gen_yes_no_reset_keyboard(),
-            parse_mode='Markdown'
+            parse_mode='MarkdownV2'
         )
         
         return ASK_RENAME
@@ -157,7 +158,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
                 logger.info(message)
                 await update.message.reply_text(
                     text=message,
-                    parse_mode='Markdown',
+                    parse_mode='MarkdownV2',
                     reply_markup=gen_yes_no_reset_keyboard(),
                 )
                 
@@ -168,7 +169,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE):
         else:
             await update.message.reply_text(
                     text='Unsupported URL. Please send a YouTube URL.',
-                    parse_mode='Markdown',
+                    parse_mode='MarkdownV2',
                 )
 
 @authorized
@@ -182,7 +183,7 @@ async def rename_query_handler(update: Update, context: ContextTypes.DEFAULT_TYP
         await query.edit_message_text(
                 f"Do you want to try to find metadata for `{context.user_data['target_filename_full']}`?",
                 reply_markup=gen_yes_no_reset_keyboard(),
-                parse_mode='Markdown'
+                parse_mode='MarkdownV2'
         )
         return ASK_METADATA_CHANGE
 
@@ -239,7 +240,7 @@ async def cover_change_query_handler(update: Update, context: ContextTypes.DEFAU
 
 @authorized
 async def receive_new_filename(update: Update, context: ContextTypes.DEFAULT_TYPE):
-    new_filename = sanitize_filename(update.message.text)
+    new_filename = escape_markdown(sanitize_filename(update.message.text))
     
     ext = context.user_data['original_file_extension']
     context.user_data['target_filename_full'] = f"{new_filename}{ext}"
@@ -248,7 +249,7 @@ async def receive_new_filename(update: Update, context: ContextTypes.DEFAULT_TYP
         await update.message.reply_text(
                 f"Do you want to try to find metadata for {new_filename}{ext}?",
                 reply_markup=gen_yes_no_reset_keyboard(),
-                parse_mode='Markdown'
+                parse_mode='MarkdownV2'
         )
         return ASK_METADATA_CHANGE
         
@@ -274,7 +275,7 @@ async def receive_metadata_credentials(update: Update, context: ContextTypes.DEF
         await update.message.reply_text(
                 f"Metadata not found, do you want to provide metadata by yourself?",
                 reply_markup=gen_yes_no_reset_keyboard(),
-                parse_mode='Markdown'
+                parse_mode='MarkdownV2'
         )
         return ASK_METADATA_CUSTOM
     
@@ -333,7 +334,7 @@ async def download_youtube_audio(update: Update, context: ContextTypes.DEFAULT_T
     try:
         with YoutubeDL(ydl_opts) as ydl:
             info = ydl.extract_info(f"https://www.youtube.com/watch?v={video_id}", download=True)
-            title = sanitize_filename(info.get('title', 'audio'))
+            title = escape_markdown(sanitize_filename(info.get('title', 'audio')))
             filename = f"{title}.mp3"
             context.user_data['target_filename_full'] = filename
             
@@ -343,7 +344,7 @@ async def download_youtube_audio(update: Update, context: ContextTypes.DEFAULT_T
         logger.error(f"Error downloading YouTube audio: {e}")
         await update.message.reply_text(
                 text=f"Failed to download YouTube audio: {e}",
-                parse_mode='Markdown',
+                parse_mode='MarkdownV2',
             )
         
 
@@ -457,7 +458,7 @@ async def ask_for_cover_block(update: Update):
     message_data = {
         'text': "Do you want to add cover?",
         'reply_markup': gen_yes_no_reset_keyboard(),
-        'parse_mode': 'Markdown'
+        'parse_mode': 'MarkdownV2'
     }
     
     query = update.callback_query
@@ -491,7 +492,7 @@ async def save_temp_file_to_music_dir(update: Update, context: ContextTypes.DEFA
     
     os.rename(temp_file_path, new_file_path)
     
-    await update.message.reply_text(f"Saved audio file as `{new_filename}`", parse_mode='Markdown')
+    await update.message.reply_text(f"Saved audio file as `{new_filename}`", parse_mode='MarkdownV2')
     
     favorite_all_songs()
 
