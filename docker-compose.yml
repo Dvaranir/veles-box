@@ -19,7 +19,7 @@ services:
       context: ./telegram-bot
       dockerfile: Dockerfile
     environment:
-      - TELEGRAM_TOKEN=${TELEGRAM_TOKEN} 
+      - TELEGRAM_TOKEN=${TELEGRAM_BOT_TOKEN}
       - TELEGRAM_USERS_WHITELIST=${TELEGRAM_USERS_WHITELIST}
       - NAVIDROME_BASE_URL=${NAVIDROME_BASE_URL}
       - NAVIDROME_USERNAME=${NAVIDROME_USERNAME}

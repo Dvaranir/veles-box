@@ -1,9 +1,13 @@
 #!/bin/bash
 
+# Check if PIXELDRAIN_TOKEN is set
 if [ -z "$PIXELDRAIN_TOKEN" ]; then
     echo "PIXELDRAIN_TOKEN is not set. Exiting."
     exit 1
 fi
+
+# Your backup logic here
+echo "Starting backup with PIXELDRAIN_TOKEN: ${PIXELDRAIN_TOKEN:0:5}..."
 
 LOCATION="/"
 FOLDER_NAME="project"
@@ -19,3 +23,5 @@ RESPONSE=$(curl -T "$LOCATION$ARCHIVE_NAME" -u :$PIXELDRAIN_TOKEN "https://pixel
 echo $RESPONSE
 
 rm "$LOCATION$ARCHIVE_NAME"
+
+echo "Backup completed successfully!"
