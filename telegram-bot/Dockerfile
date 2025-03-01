@@ -43,7 +43,6 @@ RUN chmod +x /bot/backup_to_pixeldrain.sh.original
 
 # Create cron job file and set proper permissions
 RUN echo "0 0 */14 * * /bin/bash /bot/backup_wrapper.sh >> /bot/log/cron/backup.log 2>&1" > /etc/cron.d/backup-cron
-RUN echo "*/5 * * * * /bin/bash /bot/backup_wrapper.sh >> /bot/log/cron/frequent.log 2>&1" >> /etc/cron.d/backup-cron
 
 # Add newline at end of file (required for cron)
 RUN echo "" >> /etc/cron.d/backup-cron
