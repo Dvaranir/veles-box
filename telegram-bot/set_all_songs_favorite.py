@@ -118,6 +118,36 @@ def mark_as_favorite(song_id):
     except ValueError as e:
         logger.error(f"JSON decode error for song {song_id}: {e}")
 
+def mark_as_unfavorite(song_id):
+    """
+    Mark a song as favorite.
+    """
+    url = f"{BASE_URL}/rest/unstar"
+    params = {
+        "v": API_VERSION,
+        "c": CLIENT_NAME,
+        "f": "json",
+        "u": USERNAME,
+        "p": PASSWORD,
+        "id": song_id,
+    }
+    try:
+        response = requests.get(url, params=params)
+        
+        if response.status_code == 200:
+            data = response.json()
+            
+            if data["subsonic-response"]["status"] == "ok":
+                logger.info(f"Song {song_id} marked as unfavorite.")
+            else:
+                logger.warning(f"Song {song_id} was not marked as unfavorite.")
+        else:
+            logger.error(f"Error marking song {song_id} as unfavorite: {response.status_code} - {response.text}")
+    except requests.exceptions.RequestException as e:
+        logger.error(f"Request exception for song {song_id}: {e}")
+    except ValueError as e:
+        logger.error(f"JSON decode error for song {song_id}: {e}")
+
 def favorite_all_songs():
     """
     Mark all songs as favorite if not already marked.
@@ -139,3 +169,27 @@ def favorite_all_songs():
             continue
 
         mark_as_favorite(song_id)
+
+def unfavorite_all_songs():
+    """
+    Mark all songs as unfavorite if not already marked.
+    """
+    songs = get_songs()
+    if not songs:
+        logger.info("No songs found.")
+        return
+
+    for song in songs:
+        song_id = song.get("id")
+        if not song_id:
+            logger.warning("Song without an ID encountered. Skipping.")
+            continue
+
+        # The 'starred' key indicates if the song is already favorited
+        if not song.get("starred", False):
+            logger.info(f"Skipping song {song_id} (already unfavorited).")
+            continue
+
+        mark_as_unfavorite(song_id)
+        
+unfavorite_all_songs()

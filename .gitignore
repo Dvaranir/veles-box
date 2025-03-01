@@ -11,3 +11,4 @@ telegram-bot/temp/*
 
 *backup_to_telegram.py
 *rename_files_with_artist_title.py
+__pycache__/
