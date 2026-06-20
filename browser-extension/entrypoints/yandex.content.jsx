@@ -69,7 +69,7 @@ function MusicDialog() {
 }
 
 export default defineContentScript({
-  matches: ['https://music.yandex.ru/*'],
+  matches: ['https://music.yandex.kz/*'],
   main() {
     const host = document.createElement('div'); host.id = 'veles-music-extension-root'; document.documentElement.append(host);
     const shadow = host.attachShadow({ mode: 'open' }); const style = document.createElement('style'); style.textContent = styles; shadow.append(style);

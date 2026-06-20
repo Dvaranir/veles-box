@@ -9,7 +9,7 @@ export default defineConfig({
     name: 'Veles Music Downloader',
     description: 'Сохраняет лайкнутые треки Яндекс Музыки в Navidrome',
     permissions: ['storage'],
-    host_permissions: ['https://music.yandex.ru/*', 'https://music-backend.dvaranir.com/*'],
+    host_permissions: ['https://music.yandex.kz/*', 'https://music-backend.dvaranir.com/*'],
     browser_specific_settings: { gecko: { id: 'veles-music@dvaranir.com', strict_min_version: '121.0' } },
   },
 });
