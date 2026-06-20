@@ -1,0 +1,27 @@
+{
+  "name": "@veles/browser-extension",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "wxt",
+    "dev:firefox": "wxt -b firefox",
+    "build": "wxt build",
+    "build:firefox": "wxt build -b firefox",
+    "zip": "wxt zip",
+    "zip:firefox": "wxt zip -b firefox",
+    "test": "node --test"
+  },
+  "dependencies": {
+    "@radix-ui/react-dialog": "1.1.15",
+    "@tailwindcss/vite": "4.1.11",
+    "react": "19.1.1",
+    "react-dom": "19.1.1",
+    "tailwindcss": "4.1.11",
+    "wxt": "0.20.12",
+    "@wxt-dev/module-react": "1.1.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

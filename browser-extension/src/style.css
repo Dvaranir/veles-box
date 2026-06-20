@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+:host, .veles-popup { font-family: Inter, system-ui, sans-serif; color: #f8fafc; }
+.veles-popup { width: 260px; padding: 16px; color: #111827; }
+.veles-popup form, .veles-dialog form { display: grid; gap: 10px; }
+.veles-popup input, .veles-dialog input, .veles-dialog select { border: 1px solid #94a3b8; border-radius: 6px; padding: 8px; width: 100%; box-sizing: border-box; }
+.veles-popup button, .veles-dialog button { cursor: pointer; background: #2563eb; color: white; border: 0; border-radius: 6px; padding: 8px 12px; margin: 3px; }
+.veles-popup button:disabled, .veles-dialog button:disabled { opacity: .45; cursor: default; }
+.veles-overlay { position: fixed; inset: 0; background: rgba(2, 6, 23, .72); z-index: 2147483646; }
+.veles-dialog { position: fixed; z-index: 2147483647; width: min(460px, calc(100vw - 32px)); max-height: calc(100vh - 32px); overflow: auto; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 12px; background: #0f172a; padding: 20px; box-shadow: 0 24px 60px rgba(0,0,0,.5); }
+.veles-dialog label { display: grid; gap: 4px; margin: 10px 0; }
+.veles-results { display: grid; gap: 4px; }
+.veles-results button { text-align: left; }
+.veles-pagination { display: flex; align-items: center; justify-content: space-between; margin: 10px 0; }

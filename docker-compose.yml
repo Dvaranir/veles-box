@@ -16,8 +16,8 @@ services:
   
   veles-bot:
     build:
-      context: ./telegram-bot
-      dockerfile: Dockerfile
+      context: .
+      dockerfile: telegram-bot/Dockerfile
     environment:
       - TELEGRAM_TOKEN=${TELEGRAM_BOT_TOKEN}
       - TELEGRAM_USERS_WHITELIST=${TELEGRAM_USERS_WHITELIST}
@@ -28,4 +28,21 @@ services:
     volumes:
       - "./navidrome/music:/bot/music:rw"
       - "./:/project:r"
+    restart: unless-stopped
+
+  music-backend:
+    build:
+      context: .
+      dockerfile: music-backend/Dockerfile
+    environment:
+      - MUSIC_BACKEND_PUBLIC_HOST=music-backend.dvaranir.com
+      - MUSIC_DIR=/app/music
+      - TEMP_DIR=/app/temp
+    env_file:
+      - .env
+    ports:
+      - "${MUSIC_BACKEND_PORT:-80}:80"
+    volumes:
+      - "./navidrome/music:/app/music:rw"
+      - "./music-backend/data:/app/data:rw"
     restart: unless-stopped

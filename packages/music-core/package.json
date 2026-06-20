@@ -1,0 +1,28 @@
+{
+  "name": "@veles/music-core",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --test"
+  },
+  "exports": {
+    "./tracks": "./src/domain/tracks.js",
+    "./providers/skysound": "./src/providers/skysound-provider.js",
+    "./providers/youtube": "./src/providers/youtube-provider.js",
+    "./services/search": "./src/services/provider-search.js",
+    "./services/downloads": "./src/services/track-downloads.js",
+    "./services/musicbrainz": "./src/services/musicbrainz.js",
+    "./services/audio-metadata": "./src/services/audio-metadata.js",
+    "./infrastructure/files": "./src/infrastructure/files.js",
+    "./infrastructure/command": "./src/infrastructure/command.js",
+    "./services/library": "./src/services/library.js"
+  },
+  "dependencies": {
+    "cheerio": "1.1.2",
+    "node-id3": "0.2.9"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

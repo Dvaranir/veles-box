@@ -8,18 +8,24 @@ RUN apt-get update \
     && curl -fsSL "https://github.com/yt-dlp/yt-dlp/releases/download/${YTDLP_VERSION}/yt-dlp_linux" -o /usr/local/bin/yt-dlp \
     && chmod 0755 /usr/local/bin/yt-dlp
 
-WORKDIR /bot
+WORKDIR /app
 
 COPY package.json package-lock.json ./
-RUN npm ci --omit=dev
+COPY packages/music-core/package.json packages/music-core/package.json
+COPY telegram-bot/package.json telegram-bot/package.json
+COPY music-backend/package.json music-backend/package.json
+COPY browser-extension/package.json browser-extension/package.json
+RUN npm ci --omit=dev --workspace @veles/telegram-bot --include-workspace-root
 
-COPY . .
+COPY packages/music-core packages/music-core
+COPY telegram-bot telegram-bot
 
-RUN install -m 0755 docker-start.sh /usr/local/bin/start-bot \
-    && install -m 0755 backup_to_pixeldrain.sh /usr/local/bin/backup_to_pixeldrain.sh \
-    && install -m 0755 backup_wrapper.sh /usr/local/bin/backup_wrapper.sh \
-    && mkdir -p /bot/temp /bot/music /bot/log/cron \
-    && printf '%s\n' '0 0 */14 * * root /usr/local/bin/backup_wrapper.sh >> /bot/log/cron/backup.log 2>&1' > /etc/cron.d/veles-backup \
+RUN install -m 0755 telegram-bot/docker-start.sh /usr/local/bin/start-bot \
+    && install -m 0755 telegram-bot/backup_to_pixeldrain.sh /usr/local/bin/backup_to_pixeldrain.sh \
+    && install -m 0755 telegram-bot/backup_wrapper.sh /usr/local/bin/backup_wrapper.sh \
+    && mkdir -p /bot/temp /bot/music /app/telegram-bot/log/cron \
+    && printf '%s\n' '0 0 */14 * * root /usr/local/bin/backup_wrapper.sh >> /app/telegram-bot/log/cron/backup.log 2>&1' > /etc/cron.d/veles-backup \
     && chmod 0644 /etc/cron.d/veles-backup
 
+WORKDIR /app/telegram-bot
 CMD ["/usr/local/bin/start-bot"]

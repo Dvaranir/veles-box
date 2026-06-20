@@ -1,0 +1,9 @@
+.git
+**/node_modules
+navidrome/data
+navidrome/music
+music-backend/data
+music-backend/temp
+telegram-bot/temp
+telegram-bot/music
+.env

@@ -1,0 +1,21 @@
+{
+  "name": "veles-box",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "workspaces": [
+    "packages/*",
+    "telegram-bot",
+    "music-backend",
+    "browser-extension"
+  ],
+  "scripts": {
+    "test": "npm run test --workspaces --if-present",
+    "test:bot": "npm run test --workspace @veles/telegram-bot",
+    "test:backend": "npm run test --workspace @veles/music-backend",
+    "build:extension": "npm run build --workspace @veles/browser-extension"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

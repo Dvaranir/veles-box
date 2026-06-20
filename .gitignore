@@ -13,3 +13,8 @@ telegram-bot/temp/*
 *rename_files_with_artist_title.py
 __pycache__/
 node_modules/
+music-backend/data/*
+music-backend/temp/*
+!music-backend/data/.gitkeep
+!music-backend/temp/.gitkeep
+browser-extension/.output/

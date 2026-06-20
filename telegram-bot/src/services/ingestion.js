@@ -1,16 +1,6 @@
-import path from 'node:path';
-import {
-  findAvailablePath,
-  moveFile,
-  removeIfExists,
-  safeFilenamePart,
-} from '../infrastructure/files.js';
-import {
-  inferMetadataFromFilename,
-  prepareWritableAudio,
-  readAudioMetadata,
-  writeAudioMetadata,
-} from './audio-metadata.js';
+import { removeIfExists } from '../infrastructure/files.js';
+import { inferMetadataFromFilename, readAudioMetadata } from './audio-metadata.js';
+import { saveTrackToLibrary } from '@veles/music-core/services/library';
 import { mergeMetadata } from '../domain/tracks.js';
 
 export class IngestionService {
@@ -53,28 +43,18 @@ export class IngestionService {
   }
 
   async complete(session) {
-    let writable;
     try {
-      writable = await prepareWritableAudio(session.filePath, {
-        tempDir: this.config.tempDir,
-        hasNewCover: Boolean(session.coverPath),
-      });
-      session.filePath = writable.filePath;
-
-      const taggedFile = await writeAudioMetadata(session.filePath, session.metadata, {
-        tempDir: this.config.tempDir,
+      const result = await saveTrackToLibrary({
+        filePath: session.filePath,
+        metadata: session.metadata,
         coverPath: session.coverPath,
+        tempDir: this.config.tempDir,
+        musicDir: this.config.musicDir,
       });
-      session.filePath = taggedFile;
-
-      const filename = `${safeFilenamePart(session.metadata.artist)} - ${safeFilenamePart(session.metadata.title)}${writable.extension}`;
-      const destination = await findAvailablePath(this.config.musicDir, filename);
-      await moveFile(taggedFile, destination);
       session.filePath = null;
-      await removeIfExists(session.coverPath);
       session.coverPath = null;
       this.sessions.delete(session.userId);
-      return { destination, converted: writable.converted };
+      return result;
     } catch (error) {
       await this.cancel(session.userId);
       throw error;
