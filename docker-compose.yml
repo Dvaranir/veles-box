@@ -36,13 +36,23 @@ services:
       dockerfile: music-backend/Dockerfile
     environment:
       - MUSIC_BACKEND_PUBLIC_HOST=music-backend.dvaranir.com
+      # The Express process is internal; Caddy is the only public listener.
+      - MUSIC_BACKEND_PORT=80
       - MUSIC_DIR=/app/music
       - TEMP_DIR=/app/temp
     env_file:
       - .env
-    ports:
-      - "${MUSIC_BACKEND_PORT:-80}:80"
+    networks:
+      - default
+      - caddy
     volumes:
       - "./navidrome/music:/app/music:rw"
       - "./music-backend/data:/app/data:rw"
     restart: unless-stopped
+
+networks:
+  # The existing Caddy Compose project owns this external network. Override
+  # CADDY_DOCKER_NETWORK in .env if that project uses another network name.
+  caddy:
+    external: true
+    name: ${CADDY_DOCKER_NETWORK:-lastlight_default}
