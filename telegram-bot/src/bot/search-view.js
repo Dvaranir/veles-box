@@ -9,8 +9,8 @@ function truncate(value, maxLength = 60) {
 
 export function resultLabel(track) {
   const source = SOURCE_LABELS[track.source] || track.source;
-  const bitrate = track.bitrate ? ` · ${track.bitrate} кбит/с` : '';
-  return truncate(`${source}${bitrate}: ${track.artist} — ${track.title}`);
+  const details = [source, track.duration, track.bitrate ? `${track.bitrate} кбит/с` : ''].filter(Boolean);
+  return truncate(`${details.join(' · ')}: ${track.artist} — ${track.title}`);
 }
 
 export function createSearchPage(session, page, pageSize) {

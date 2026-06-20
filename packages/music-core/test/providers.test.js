@@ -1,14 +1,27 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { parseSkySoundDownloadUrl, parseSkySoundSearch, skySoundSearchUrl } from '../src/providers/skysound-provider.js';
+import { YouTubeProvider } from '../src/providers/youtube-provider.js';
 import { searchProviders } from '../src/services/provider-search.js';
 
 test('parses SkySound cards and dedicated download links', () => {
-  const tracks = parseSkySoundSearch('<li class="__adv_list_track"><a class="playlist-down no-ajax" href="/t/1"></a><span class="__adv_artist">Artist</span><span class="__adv_name">Title</span><span class="__adv_duration">3:00</span></li>');
+  const tracks = parseSkySoundSearch('<li class="__adv_list_track"><a class="playlist-down no-ajax" href="/t/1"></a><span class="__adv_artist">Artist</span><span class="__adv_name">Title</span><span class="__adv_duration">3:09</span></li>');
   assert.equal(tracks[0].artist, 'Artist');
   assert.equal(tracks[0].title, 'Title');
+  assert.equal(tracks[0].duration, '3:09');
   assert.match(skySoundSearchUrl('Вежливый Мордобой'), /skysound7\.com/);
   assert.equal(parseSkySoundDownloadUrl('<a class="onesongblock-down __adv_download" href="https://cdn.test/a.mp3"></a>'), 'https://cdn.test/a.mp3');
+});
+
+test('keeps yt-dlp duration strings in YouTube search results', async () => {
+  const provider = new YouTubeProvider({
+    ytDlpPath: 'yt-dlp', tempDir: '/tmp', timeoutMs: 1_000, searchLimit: 1,
+    commandRunner: async () => ({ stdout: JSON.stringify({ entries: [{ id: 'video-id', title: 'Artist - Title', duration_string: '1:02:03', abr: 192 }] }) }),
+  });
+
+  const [track] = await provider.search('Artist - Title');
+  assert.equal(track.duration, '1:02:03');
+  assert.equal(track.bitrate, 192);
 });
 
 test('keeps successful provider results when another provider fails', async () => {

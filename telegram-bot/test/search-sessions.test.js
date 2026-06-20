@@ -8,7 +8,7 @@ import {
   searchPageCallback,
   searchSelectCallback,
 } from '../src/services/search-sessions.js';
-import { createSearchPage } from '../src/bot/search-view.js';
+import { createSearchPage, resultLabel } from '../src/bot/search-view.js';
 
 function tracks(count) {
   return Array.from({ length: count }, (_, index) => createTrack({
@@ -49,4 +49,15 @@ test('renders a paginated keyboard with result callbacks', () => {
   assert.match(view.text, /Страница 2\/2/);
   assert.match(JSON.stringify(view.replyMarkup.inline_keyboard), /s:t:/);
   assert.match(JSON.stringify(view.replyMarkup.inline_keyboard), /s:p:/);
+});
+
+test('renders result duration before bitrate and omits absent details', () => {
+  assert.equal(
+    resultLabel(createTrack({ source: 'skysound', artist: 'Artist', title: 'Title', duration: '3:09', bitrate: 128 })),
+    'SkySound · 3:09 · 128 кбит/с: Artist — Title',
+  );
+  assert.equal(
+    resultLabel(createTrack({ source: 'youtube', artist: 'Artist', title: 'Title' })),
+    'YouTube: Artist — Title',
+  );
 });
