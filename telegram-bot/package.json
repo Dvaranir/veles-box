@@ -1,5 +1,5 @@
 {
-  "name": "veles-telegram-bot",
+  "name": "@veles/telegram-bot",
   "version": "1.0.0",
   "private": true,
   "type": "module",

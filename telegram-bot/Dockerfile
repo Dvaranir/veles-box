@@ -1,11 +1,13 @@
 FROM node:22-bookworm-slim
 
 ARG YTDLP_VERSION=2024.12.23
+ARG TARGETARCH
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends ffmpeg cron zip curl ca-certificates \
     && rm -rf /var/lib/apt/lists/* \
-    && curl -fsSL "https://github.com/yt-dlp/yt-dlp/releases/download/${YTDLP_VERSION}/yt-dlp_linux" -o /usr/local/bin/yt-dlp \
+    && case "${TARGETARCH:-amd64}" in amd64) ytdlp_asset=yt-dlp_linux ;; arm64) ytdlp_asset=yt-dlp_linux_aarch64 ;; *) echo "Unsupported architecture: ${TARGETARCH}" >&2; exit 1 ;; esac \
+    && curl -fsSL "https://github.com/yt-dlp/yt-dlp/releases/download/${YTDLP_VERSION}/${ytdlp_asset}" -o /usr/local/bin/yt-dlp \
     && chmod 0755 /usr/local/bin/yt-dlp
 
 WORKDIR /app
