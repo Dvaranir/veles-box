@@ -55,4 +55,4 @@ networks:
   # CADDY_DOCKER_NETWORK in .env if that project uses another network name.
   caddy:
     external: true
-    name: ${CADDY_DOCKER_NETWORK:-lastlight_default}
+    name: ${CADDY_DOCKER_NETWORK:-dnd_default}
