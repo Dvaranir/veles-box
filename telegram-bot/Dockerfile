@@ -10,15 +10,11 @@ RUN apt-get update \
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-COPY packages/music-core/package.json packages/music-core/package.json
-COPY telegram-bot/package.json telegram-bot/package.json
-COPY music-backend/package.json music-backend/package.json
-COPY browser-extension/package.json browser-extension/package.json
+# npm ci resolves workspaces from their on-disk package directories. Copy the
+# workspace tree before dependency installation; copying manifests alone makes
+# npm report "No workspaces found" in a Docker build context.
+COPY . .
 RUN npm ci --omit=dev --workspace @veles/telegram-bot --include-workspace-root
-
-COPY packages/music-core packages/music-core
-COPY telegram-bot telegram-bot
 
 RUN install -m 0755 telegram-bot/docker-start.sh /usr/local/bin/start-bot \
     && install -m 0755 telegram-bot/backup_to_pixeldrain.sh /usr/local/bin/backup_to_pixeldrain.sh \

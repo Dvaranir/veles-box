@@ -10,15 +10,11 @@ RUN apt-get update \
 
 WORKDIR /app
 
-COPY package.json package-lock.json ./
-COPY packages/music-core/package.json packages/music-core/package.json
-COPY telegram-bot/package.json telegram-bot/package.json
-COPY music-backend/package.json music-backend/package.json
-COPY browser-extension/package.json browser-extension/package.json
+# npm ci resolves workspaces from their on-disk package directories. Copy the
+# workspace tree before dependency installation; copying manifests alone makes
+# npm report "No workspaces found" in a Docker build context.
+COPY . .
 RUN npm ci --omit=dev --workspace @veles/music-backend --include-workspace-root
-
-COPY packages/music-core packages/music-core
-COPY music-backend music-backend
 
 RUN mkdir -p /app/data /app/music /app/temp
 

@@ -6,4 +6,5 @@ music-backend/data
 music-backend/temp
 telegram-bot/temp
 telegram-bot/music
+browser-extension/.output
 .env
