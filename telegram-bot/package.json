@@ -1,0 +1,19 @@
+{
+  "name": "veles-telegram-bot",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "start": "node src/index.js",
+    "test": "node --test",
+    "test:watch": "node --test --watch"
+  },
+  "dependencies": {
+    "cheerio": "1.1.2",
+    "dotenv": "16.6.1",
+    "grammy": "1.38.2"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

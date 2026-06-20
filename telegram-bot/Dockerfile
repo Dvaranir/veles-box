@@ -1,55 +1,25 @@
-# Use the official Python image from the Docker Hub
-FROM python:3.12-slim
+FROM node:22-bookworm-slim
 
-# Install cron
-RUN apt-get update && apt-get install -y zip curl nano cron ffmpeg bash
+ARG YTDLP_VERSION=2024.12.23
 
-# Set nano as the default editor for cron
-RUN echo "export VISUAL=nano" >> /etc/environment && echo "export EDITOR=nano" >> /etc/environment
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends ffmpeg cron zip curl ca-certificates \
+    && rm -rf /var/lib/apt/lists/* \
+    && curl -fsSL "https://github.com/yt-dlp/yt-dlp/releases/download/${YTDLP_VERSION}/yt-dlp_linux" -o /usr/local/bin/yt-dlp \
+    && chmod 0755 /usr/local/bin/yt-dlp
 
-# Set the working directory
 WORKDIR /bot
 
-# Copy the requirements file into the container
-COPY requirements.txt .
+COPY package.json package-lock.json ./
+RUN npm ci --omit=dev
 
-# Install the dependencies
-RUN pip install --no-cache-dir -r requirements.txt
-
-# Copy the rest of the application code into the container
 COPY . .
 
-RUN mkdir -p ./log/cron
+RUN install -m 0755 docker-start.sh /usr/local/bin/start-bot \
+    && install -m 0755 backup_to_pixeldrain.sh /usr/local/bin/backup_to_pixeldrain.sh \
+    && install -m 0755 backup_wrapper.sh /usr/local/bin/backup_wrapper.sh \
+    && mkdir -p /bot/temp /bot/music /bot/log/cron \
+    && printf '%s\n' '0 0 */14 * * root /usr/local/bin/backup_wrapper.sh >> /bot/log/cron/backup.log 2>&1' > /etc/cron.d/veles-backup \
+    && chmod 0644 /etc/cron.d/veles-backup
 
-# Create startup script that exports environment variables for cron
-RUN echo '#!/bin/bash\n\
-# Export environment variables to a file that will be sourced by cron jobs\n\
-env | grep -v "no_proxy" > /etc/environment\n\
-service cron start\n\
-python main.py' > /bot/start.sh
-RUN chmod +x /bot/start.sh
-
-# Modify the backup script to source environment variables
-RUN echo '#!/bin/bash\n\
-# Source environment variables\n\
-source /etc/environment\n\
-# Run the original backup script with environment loaded\n\
-/bot/backup_to_pixeldrain.sh.original' > /bot/backup_wrapper.sh
-RUN chmod +x /bot/backup_wrapper.sh
-
-# Rename the original script
-RUN if [ -f /bot/backup_to_pixeldrain.sh ]; then mv /bot/backup_to_pixeldrain.sh /bot/backup_to_pixeldrain.sh.original; fi
-RUN chmod +x /bot/backup_to_pixeldrain.sh.original
-
-# Create cron job file and set proper permissions
-RUN echo "0 0 */14 * * /bin/bash /bot/backup_wrapper.sh >> /bot/log/cron/backup.log 2>&1" > /etc/cron.d/backup-cron
-
-# Add newline at end of file (required for cron)
-RUN echo "" >> /etc/cron.d/backup-cron
-
-RUN chmod 0644 /etc/cron.d/backup-cron
-RUN crontab /etc/cron.d/backup-cron
-
-# Use the startup script as the entry point
-CMD ["/bin/bash", "/bot/start.sh"]
-
+CMD ["/usr/local/bin/start-bot"]

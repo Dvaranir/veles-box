@@ -21,14 +21,11 @@ services:
     environment:
       - TELEGRAM_TOKEN=${TELEGRAM_BOT_TOKEN}
       - TELEGRAM_USERS_WHITELIST=${TELEGRAM_USERS_WHITELIST}
-      - NAVIDROME_BASE_URL=${NAVIDROME_BASE_URL}
-      - NAVIDROME_USERNAME=${NAVIDROME_USERNAME}
-      - NAVIDROME_PASSWORD=${NAVIDROME_PASSWORD}
       - PIXELDRAIN_TOKEN=${PIXELDRAIN_TOKEN}
+      - SEARCH_PAGE_SIZE=${SEARCH_PAGE_SIZE:-10}
     env_file:
       - .env
     volumes:
       - "./navidrome/music:/bot/music:rw"
-      - "./configs/cron:/etc/crontabs:rw"
       - "./:/project:r"
     restart: unless-stopped
