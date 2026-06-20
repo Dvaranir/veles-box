@@ -6,15 +6,19 @@ import { normalizeYandexCoverUrl } from './yandex-cover-url.js';
 export { normalizeYandexCoverUrl } from './yandex-cover-url.js';
 
 export class CoverService {
-  constructor({ tempDir, maxBytes, timeoutMs }) { Object.assign(this, { tempDir, maxBytes, timeoutMs }); }
+  constructor({ tempDir, maxBytes, timeoutMs, download = downloadUrl }) { Object.assign(this, { tempDir, maxBytes, timeoutMs, download }); }
 
   async fromYandex(url) {
     const sourcePath = temporaryPath(this.tempDir, '.image');
     try {
-      const response = await downloadUrl(normalizeYandexCoverUrl(url), sourcePath, { timeoutMs: this.timeoutMs, redirect: 'error' });
+      const response = await this.download(normalizeYandexCoverUrl(url), sourcePath, { timeoutMs: this.timeoutMs, redirect: 'error' });
       const contentLength = Number(response.headers.get('content-length') || 0);
       if (contentLength > this.maxBytes) throw new Error('Yandex cover exceeds the size limit');
-      return this.#toWebp(sourcePath);
+      const { size } = await fs.stat(sourcePath);
+      if (size > this.maxBytes) throw new Error('Yandex cover exceeds the size limit');
+      // Do not return the promise directly: finally would remove sourcePath
+      // while Sharp is still decoding it.
+      return await this.#toWebp(sourcePath);
     } finally {
       await fs.rm(sourcePath, { force: true });
     }
@@ -25,13 +29,18 @@ export class CoverService {
   }
 
   async #toWebp(inputPath) {
-    const metadata = await sharp(inputPath, { limitInputPixels: 20_000_000 }).metadata();
-    if (!metadata.width || !metadata.height) throw new Error('The uploaded cover is not an image');
     const outputPath = temporaryPath(this.tempDir, '.webp');
-    await sharp(inputPath, { limitInputPixels: 20_000_000 })
-      .resize(1000, 1000, { fit: 'inside', withoutEnlargement: true })
-      .webp({ quality: 95 })
-      .toFile(outputPath);
-    return outputPath;
+    try {
+      const metadata = await sharp(inputPath, { limitInputPixels: 20_000_000 }).metadata();
+      if (!metadata.width || !metadata.height) throw new Error('The uploaded cover is not an image');
+      await sharp(inputPath, { limitInputPixels: 20_000_000 })
+        .resize(1000, 1000, { fit: 'inside', withoutEnlargement: true })
+        .webp({ quality: 95 })
+        .toFile(outputPath);
+      return outputPath;
+    } catch (error) {
+      await fs.rm(outputPath, { force: true });
+      throw error;
+    }
   }
 }

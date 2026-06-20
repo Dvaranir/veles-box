@@ -20,6 +20,7 @@ test('creates the protected Express application with its API dependencies', asyn
       logger: { error: () => {} },
     });
     assert.equal(typeof app, 'function');
+    assert.equal(app.get('trust proxy'), 1);
   } finally {
     await fs.rm(tempDir, { recursive: true, force: true });
   }

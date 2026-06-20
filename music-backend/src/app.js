@@ -46,6 +46,10 @@ export function createApp({ config, auth, providers, searchStore, jobs, jobServi
   const upload = multer({ dest: config.tempDir, limits: { fileSize: config.maxCoverBytes, files: 1 } });
 
   app.disable('x-powered-by');
+  // The backend is reachable only through the Caddy container on the shared
+  // Docker network. Trust that single hop so rate limits can use the forwarded
+  // client address and express-rate-limit does not reject X-Forwarded-For.
+  app.set('trust proxy', 1);
   app.use((request, response, next) => {
     const host = (request.hostname || '').toLowerCase();
     const localTestHost = process.env.NODE_ENV === 'test' && ['127.0.0.1', 'localhost'].includes(host);
